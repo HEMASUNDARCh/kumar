@@ -1,12 +1,57 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Page Title</title>
-</head>
-<body>
-    <h1>This is a Heading</h1>
-    <p>This is a paragraph of text.</p>
-</body>
-</html>
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Smile, Frown, Meh, Sun, Moon, Plus } from "lucide-react";
+
+// ==========================
+// Mood Mosaic – SPA
+// ==========================
+
+const MOODS = [
+  { id: "happy", label: "Happy", color: "#facc15", shape: "circle", icon: <Smile /> },
+  { id: "calm", label: "Calm", color: "#38bdf8", shape: "square", icon: <Meh /> },
+  { id: "stressed", label: "Stressed", color: "#ef4444", shape: "triangle", icon: <Frown /> },
+  { id: "excited", label: "Excited", color: "#a855f7", shape: "hex", icon: <Sun /> },
+  { id: "tired", label: "Tired", color: "#94a3b8", shape: "diamond", icon: <Moon /> },
+];
+
+const todayKey = () => new Date().toISOString().slice(0, 10);
+
+function loadState() {
+  try {
+    return JSON.parse(localStorage.getItem("mood-mosaic:v1")) || [];
+  } catch {
+    return [];
+  }
+}
+
+function saveState(state) {
+  localStorage.setItem("mood-mosaic:v1", JSON.stringify(state));
+}
+
+function Shape({ mood, size = 50 }) {
+  const s = size;
+  const c = mood.color;
+  switch (mood.shape) {
+    case "circle":
+      return <circle cx={s / 2} cy={s / 2} r={s / 2} fill={c} />;
+    case "square":
+      return <rect width={s} height={s} fill={c} rx={8} />;
+    case "triangle":
+      return <polygon points={`${s / 2},0 ${s},${s} 0,${s}`} fill={c} />;
+    case "hex":
+      return (
+        <polygon
+          points={`${s * 0.5},0 ${s},${s * 0.25} ${s},${s * 0.75} ${s * 0.5},${s} 0,${s * 0.75} 0,${s * 0.25}`}
+          fill={c}
+        />
+      );
+    case "diamond":
+      return <polygon points={`${s / 2},0 ${s},${s / 2} ${s / 2},${s} 0,${s / 2}`} fill={c} />;
+    default:
+      return <rect width={s} height={s} fill={c} />;
+  }
+}
+
+export default function MoodMosaicApp() {
+  const [entries, setEntries] = useState(loadState);
+  const [selectedMood, setSelectedMo
